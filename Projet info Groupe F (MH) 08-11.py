@@ -46,7 +46,3 @@ def deplacement_aleatoire(tableau, caseAvant):
     tableau[caseApres] = natureFourmi
     return E
 
-
-print ('Fini')
-
-
