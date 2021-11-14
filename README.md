@@ -2,13 +2,10 @@
 
 # GIT
 
-* Installation Git
+* Installation Git : https://git-scm.com/
 * Configuration Git 
 ```bash
     git config --global user.name "John Doe"
     git config --global user.email johndoe@example.com
 ```
-
-## VS Code
-* Installation
-* 
+* Faire une copie du dépot
