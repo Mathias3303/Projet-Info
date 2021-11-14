@@ -4,23 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## Variables majeures
-CODE_FOURMI = 1
+CODE_FOURMI_SANS_RAU = 1
+CODE_FOURMI_AVEC_RAU = 2
 CODE_OBSTACLE = -1
 CODE_PRATICABLE = 0
+CODE_RAU = 3
 
 
-## Environnement E, carré de 10*10 cases praticables
-E = np.zeros((11,11))
+## Environnement E, rectangle de maxX*maxY cases praticables
+maxX = int(input('nombres de lignes de E = '))
+maxY = int(input('nombre de colonnes de E = '))
+E = np.zeros((maxX+2,maxY+2))
 E[:,0] = CODE_OBSTACLE
 E[0,:] = CODE_OBSTACLE
-E[10,:] = CODE_OBSTACLE
-E[:,10] = CODE_OBSTACLE
+E[maxX+1,:] = CODE_OBSTACLE
+E[:,maxY+1] = CODE_OBSTACLE
 print(E)
 
 
-## Placement des fourmis
-E[5,5] = CODE_FOURMI
+## Position des fourmis sans RAU
+E[(6,6)] = CODE_FOURMI_SANS_RAU
 print(E)
+
+## Position des fourmis avec RAU
+
 
 
 ## Liste des cases praticables parmi les 8 voisines de "case"
@@ -45,4 +52,49 @@ def deplacement_aleatoire(tableau, caseAvant):
     tableau[caseAvant] = 0
     tableau[caseApres] = natureFourmi
     return E
+
+
+
+
+## Attractivité de l'environnement pour la fourmi active
+
+
+
+
+
+
+## Mise en place choisie des RAU
+NbRAU = int(input('Nombre de RAU à t=0 : '))
+positionsRAU = []
+if NbRAU <= maxX*maxY:
+    for k in range(NbRAU):
+        xRAU = int(input('x de RAU : '))
+        yRAU = int(input('y de RAU : '))
+        xyRAU = (xRAU,yRAU)
+        if E[xyRAU] == CODE_PRATICABLE:
+            positionsRAU.append((xRAU,yRAU))
+    for l in positionsRAU:
+        E[l] = CODE_RAU
+    print(E)
+else:
+    print('Pas assez de place dans E pour autant de RAU')
+
+
+## Mise en place aléatoire des RAU
+NbRAU = int(input('Nombre de RAU à t=0 : '))
+positionsRAU = []
+if NbRAU <= maxX*maxY:
+    for k in range(NbRAU):
+        xRAU = randint(1,maxX)
+        yRAU = randint(1,maxY)
+        positionsRAU.append((xRAU,yRAU))
+    for l in positionsRAU:
+        if E[l] == CODE_PRATICABLE:
+            E[l] = CODE_RAU
+    print(E)
+else:
+    print('Pas assez de place dans E pour autant de RAU')
+
+
+
 
