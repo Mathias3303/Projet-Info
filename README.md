@@ -9,3 +9,4 @@
     git config --global user.email johndoe@example.com
 ```
 * Faire une copie du dépot
+* Git
