@@ -1,4 +1,4 @@
-from random import randint
+from random import * #FB je déconseille ça
 import matplotlib as mpl
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 CODE_OBSTACLE = -1
 CODE_PRATICABLE = 0
 CODE_RAU = 3
+CODE_FOURMILIERE = 8
+
+
+NB_RAU_COLLECTEES = 0 #idee booleen compteur de RAU rentrées à la maison qui acheve le programme (while)
 
 
 INFLUENCE_DEPLACEMENT = 5
@@ -28,55 +32,69 @@ LISTE_POSITION_RAU = [(5,5),(4,4)]
 for coord in LISTE_POSITION_RAU :
     ENVIRONNEMENT[coord] = CODE_RAU
 
+ENVIRONNEMENT[(6,6)] = CODE_FOURMILIERE
+
 
 print(ENVIRONNEMENT)
 
 
-## Position des fourmis, WARNING : ne pas les mettre sur les CODE_OBSTACLE
-FOURMIS_SANS_RAU = [(4,6),(6,6)]
-FOURMIS_AVEC_RAU = [(4,8),(2,8)]
+## Position des fourmis
+FOURMIS_SANS_RAU = []
+FOURMIS_AVEC_RAU = [(5,5),(7,4)]
+
+VECTEUR_VITESSE_FOURMIS_AVEC_RAU = []
+VECTEUR_VITESSE_FOURMIS_AVEC_RAU = []
 
 
 ## Liste des cases pratiquables parmi les 8 voisines de "case"
-def liste_des_voisins_pratiquables(tableau,case):
+def liste_des_voisins_praticables(tableau,case):
     '''Renvoie liste des coordonnees des cases accessibles'''
     i = case[0]
     j = case[1]
-    voisins_potentiels = [(i-1,j),(i+1,j),(i,j-1),(i,j+1),(i-1,j-1),(i+1,j+1),(i+1,j-1),(i-1,j+1)]
-    indice_voisins_pratiquables = []
+    voisins_potentiels = [(i-1,j-1),(i-1,j),(i-1,j+1),(i,j+1),(i+1,j+1),(i+1,j),(i+1,j-1),(i,j-1)]
+    indice_voisins_praticables = []
     for candidat in voisins_potentiels:
         if (0 <= candidat[0] < tableau.shape[0]) and (0 <= candidat[1] < tableau.shape[1]):
-            indice_voisins_pratiquables.append(candidat)
-    return indice_voisins_pratiquables
+            indice_voisins_praticables.append(candidat)
+    return indice_voisins_praticables
 
 
 ## Deplacement aléatoire, contraint par les obstacles, d'une fourmi de "caseAvant" à "caseAprès"
 
 def deplacement_aleatoire() :
     for k in range(len(FOURMIS_AVEC_RAU)) :
-        L = liste_des_voisins_pratiquables(ENVIRONNEMENT, FOURMIS_AVEC_RAU[k])
+        L = liste_des_voisins_praticables(ENVIRONNEMENT, FOURMIS_AVEC_RAU[k])
         nb_hasard = randint(0, len(L)-1)
         FOURMIS_AVEC_RAU[k] = L[nb_hasard]
 
 
     for k in range(len(FOURMIS_SANS_RAU)) :
-        L = liste_des_voisins_pratiquables(ENVIRONNEMENT, FOURMIS_SANS_RAU[k])
+        L = liste_des_voisins_praticables(ENVIRONNEMENT, FOURMIS_SANS_RAU[k])
         nb_hasard = randint(0, len(L)-1)
         FOURMIS_SANS_RAU[k] = L[nb_hasard]
 
 
 ## Attractivité de l'environnement pour la fourmi active
 
-def attrac_deplacement() :
-
-    for k in range(len(FOURMIS_AVEC_RAU)) :
-        Lcoord = liste_des_voisins_pratiquables(ENVIRONNEMENT, FOURMIS_AVEC_RAU[k])
-        Lattract = [INFLUENCE_CASE for x in Lcoord]
-
-    print(Lattract)
+def delta(case_suivante , case_actuelle):
+    di = case_suivante[0] - case_actuelle[0]
+    dj = case_suivante[1] - case_actuelle[1]
+    liste_delta = [ di , dj ]
+    return liste_delta
 
 
-## Mise en place choisie des RAU
+
+
+def poids_deplacement():
+    for k in range(len(FOURMIS_AVEC_RAU)):
+        case_actuelle = FOURMIS_AVEC_RAU[k]
+        delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k]
+        voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , caseactuelle)
+        L_delta_possible = []
+        for case_possible in voisins_praticables :
+            L_delta_possible.append( delta(case_possible , caseactuelle) )
+
+
 
 
 
@@ -113,6 +131,7 @@ def remplit_RAU_au_hasard(nbUnites) :
 
 ## Affichage graphique
 def affichage_graphique() :
+    '''fonction qui affiche l'ENVIRONNEMENT'''
     plt.imshow(ENVIRONNEMENT)  #FB on affiche le terrain
 
     #FB Puis on affiche les fourmis
