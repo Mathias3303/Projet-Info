@@ -2,6 +2,7 @@ from random import * #FB je déconseille ça
 import matplotlib as mpl
 import numpy as np
 import matplotlib.pyplot as plt
+from math import pi
 
 ## Variables globales
 CODE_OBSTACLE = -1
@@ -13,7 +14,12 @@ CODE_FOURMILIERE = 8
 NB_RAU_COLLECTEES = 0 #idee booleen compteur de RAU rentrées à la maison qui acheve le programme (while)
 
 
-INFLUENCE_DEPLACEMENT = 5
+INFLUENCE_COS_0 = 5
+INFLUENCE_COS_PId4 = 3
+INFLUENCE_COS_PId2 = 2
+INFLUENCE_COS_3PId4 = 1
+INFLUENCE_COS_PI = 0
+
 INFLUENCE_CASE = 1
 
 ## Environnement E, rectangle de maxX*maxY cases pratiquables
@@ -76,11 +82,11 @@ def deplacement_aleatoire() :
 
 ## Attractivité de l'environnement pour la fourmi active
 
-def delta(case_suivante , case_actuelle):
+def couple_delta(case_suivante , case_actuelle):
     di = case_suivante[0] - case_actuelle[0]
     dj = case_suivante[1] - case_actuelle[1]
-    liste_delta = [ di , dj ]
-    return liste_delta
+    couple_delta = ( di , dj )
+    return couple_delta
 
 
 
@@ -88,14 +94,30 @@ def delta(case_suivante , case_actuelle):
 def poids_deplacement():
     for k in range(len(FOURMIS_AVEC_RAU)):
         case_actuelle = FOURMIS_AVEC_RAU[k]
-        delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k]
+        delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k] #couple_delta de l'actuel
         voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , caseactuelle)
-        L_delta_possible = []
+        L_cos_voisins_praticables = []
+        L_attractivite_des_voisins_praticables = []
+        norme_vecteur_actuel = ( (delta_actuel[0])**2 + (delta_actuel[1])**2 )**(1/2)
+
         for case_possible in voisins_praticables :
-            L_delta_possible.append( delta(case_possible , caseactuelle) )
+            delta_case_possible = couple_delta(case_possible, case_actuelle)
+            produit_scalaire = np.dot(delta_actuel, delta_case_possible)
+            norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2)
+            cos_case_possible = produit_scalaire / norme_vecteur_possible
+            L_cos_voisins_praticables.append(cos_case_possible)
 
-
-
+        for element in L_cos_voisins_praticables :
+            if element == 0 :
+                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_0)
+            if element == pi/4 or element == -pi/4 :
+                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PId4)
+            if element == pi/2 or element == -pi/2 :
+                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PId2)
+            if element == 3*pi/4 or element == -3*pi/4 :
+                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_3PId4)
+            if element == pi or element == -pi :
+                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PI)
 
 
 
@@ -131,7 +153,6 @@ def remplit_RAU_au_hasard(nbUnites) :
 
 ## Affichage graphique
 def affichage_graphique() :
-    '''fonction qui affiche l'ENVIRONNEMENT'''
     plt.imshow(ENVIRONNEMENT)  #FB on affiche le terrain
 
     #FB Puis on affiche les fourmis
@@ -148,3 +169,7 @@ def affichage_graphique() :
 
     plt.axis('equal')
     plt.show()
+
+
+
+
