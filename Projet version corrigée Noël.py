@@ -5,13 +5,6 @@ import matplotlib.pyplot as plt
 from math import pi
 import matplotlib.colors as couleurs
 
-#FB  petit cadeau de Noël : je vous ai mis le code pour faire un affichage coloré (avec des couleurs paramétrables) et notamment des couleurs différentes pour les fourmis avec et sans RAU (au passage, pour que ce soit simple, j’ai  modifié le code que vous aviez déterminé pour les cases du tableau ENVIRONNEMENT : c’était bie nrpatique que vous ayez des variables globales plutôt que des « -1 » ici et là !)
-
-#FB deuxièmement, je vous ai fait la boucle principale (avec un petit bonus : si on ferme la fenêtre, le programme s’arrête !). Une remarque stratégique :   cela aurait été bien de la mettre en place en premier pour pouvoir tester vos idées rapidement.
-
-#FB le programme fonctionen de la façon suivante : on exécute simplement le fichier, et il nosu montre un exempel de simulation suivant
-
-#FB Pour que ce soit clair, j'ai bien séparé les variables globales en deux : les variables techniques et celles liées à l'exemple actuel.
 
 #FB Il y a parfois une petite erreur très subtile dans le mouvement des fourmis (rarement !). La verrez-vous ? =D
 
@@ -19,12 +12,12 @@ import matplotlib.colors as couleurs
 
 ## Variables globales techniques
 
-#FB Je vais modifier les codes ci-dessous pour vous permettre d'avoir un code couleur précis, je vous expliquerai comment ça marche.
+#FB Je vais modifier les codes ci-dessous pour vous permettre d'avoir un code couleur précis, JE VOUS EXPLIQUERAI COMMENT CA MARCHE.
 
 #FB Les deux variables suivantes vont permettre de dessiner le monde avec des couleurs définies :
 
 # blanc pour les cases vides
-# gri pour les obstacles
+# gris pour les obstacles
 # vert pour la / les fourmilières
 # rouge pour les stocks de nourriture
 
@@ -44,7 +37,8 @@ CODE_RAU = 2
 CODE_FOURMILIERE = 3
 
 
-NB_RAU_COLLECTEES = 0 #idee booleen compteur de RAU rentrées à la maison qui acheve le programme (while)
+NB_RAU_INITIAL = 3 #ici, test manuel ; à implémenter dans remplit_RAU_au_hasard
+NB_RAU_COLLECTEES = 0 #idee booleen compteur de RAU rentrées à la maison qui acheve le programme (while), cf. dernière fonction
 
 
 INFLUENCE_COS_0 = 5
@@ -53,7 +47,8 @@ INFLUENCE_COS_PId2 = 2
 INFLUENCE_COS_3PId4 = 1
 INFLUENCE_COS_PI = 0
 
-INFLUENCE_CASE = 1
+INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
+
 
 SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cours (tant qu'elle vaut True, la boucle principale continue - elle devient False par exemple si on ferme la fenêtre grâce à un bout de code que je vous ai mis en cadeau bonus !)
 
@@ -79,22 +74,22 @@ for coord in LISTE_POSITION_RAU :
 
 ENVIRONNEMENT[(5,5)] = CODE_FOURMILIERE
 
-ENVIRONNEMENT[2,3] = ENVIRONNEMENT[7,6] = ENVIRONNEMENT[4,7] = CODE_OBSTACLE
+
 
 
 print(ENVIRONNEMENT)
 
 
 
-FOURMIS_SANS_RAU = [(5,5),(5,5),(5,5)]
+FOURMIS_SANS_RAU = [(5,5),(5,5),(5,5),(5,5),(5,5),(5,5),(5,5)]
 FOURMIS_AVEC_RAU = []
 
-#FB Pour quoi deux fois la ligne suivante ? J'en enlève un
 
-VECTEUR_VITESSE_FOURMIS_AVEC_RAU = []
-#VECTEUR_VITESSE_FOURMIS_AVEC_RAU = []
 
-TEMPS_PAUSE = 1
+VECTEUR_VITESSE_FOURMIS_AVEC_RAU = [] #à supprimer ? ancien chemin pour le déplacement choisi
+
+
+TEMPS_PAUSE = 1 #nani ?
 
 
 
@@ -111,32 +106,31 @@ def remplit_RAU_au_hasard(nbUnites) :
 
     '''
 
-    global NbRAU
+    global NB_RAU_INITIAL
 
-    NbRAU = nbUnites
+    NB_RAU_INITIAL = nbUnites
 
     #FB je remplace le input par un paramètre dans ma fonction
 
-    positionsRAU = []
-
     #FB l'algo que vous utilisez ci-dessous ne fait pas ce que vous voulez de manière sure : si par hasard il tombe deux fois sur la même case, ou à un moment sur une case obstacle, à la fin vous aurez moins de cases RAU que vous le vouliez... à améliorer...
 
-    if NbRAU <= maxX*maxY:
-        for k in range(NbRAU):
+    Nb_RAU_placees = 0
+
+    if NB_RAU_INITIAL <= maxX*maxY:
+        while Nb_RAU_placees < NB_RAU_INITIAL:
             xRAU = randint(1,maxX)
             yRAU = randint(1,maxY)
-            positionsRAU.append((xRAU,yRAU))
-        for l in positionsRAU:
-            if ENVIRONNEMENT[l] == CODE_PRATICABLE:
-                ENVIRONNEMENT[l] = CODE_RAU
-        #print(ENVIRONNEMENT) #FB Bien c'est très bien de faire un print()
-        #FB On n'oublie pas de l'enlever (ou le commenter) quand on est sûr de son code
+            positionRAU = (xRAU,yRAU)
+            if ENVIRONNEMENT[positionRAU] == CODE_PRATICABLE:
+                ENVIRONNEMENT[positionRAU] = CODE_RAU
+                Nb_RAU_placees += 1
+
     else:
         print('Pas assez de place dans E pour autant de RAU')
 
 #FB Faire de même la fonction suivante :
 
-def remplit_RAU_au_hasard(nbObstacles) :
+def remplit_obstacles_au_hasard(nbObstacles) :
     '''
     met nbObstacles obstacles dans la variable ENVIRONNEMENT
     '''
@@ -249,8 +243,8 @@ def deplacement_des_fourmis() :
     gère le déplacement de toutes les fourmis, et le changemetn d'état entre "sans RAU" et "avec RAU"
     '''
 
+    global NB_RAU_COLLECTEES
     global FOURMIS_AVEC_RAU, FOURMIS_SANS_RAU
-    #FB comprenez-vous l'intérêt de la ligne précédente ?
 
 
     #FB Comprenez-vous la différence de traitement ci-dessous entre fourmis avec et sans RAU ? Notamment, y a-t-il une importance à traiter d'abord les fourmis avec RAU ou est-ce indifférent ?
@@ -258,13 +252,18 @@ def deplacement_des_fourmis() :
 
     for fourmi in FOURMIS_AVEC_RAU :
         FOURMIS_AVEC_RAU.remove(fourmi)
-        FOURMIS_AVEC_RAU.append(deplacement_une_fourmi(fourmi))
+        new_position = deplacement_une_fourmi(fourmi)
+        if ENVIRONNEMENT[new_position] == CODE_FOURMILIERE :
+            print( "la fourmi", fourmi, "a rempli son quota")
+            NB_RAU_COLLECTEES += 1
+        else :
+            FOURMIS_AVEC_RAU.append(deplacement_une_fourmi(fourmi))
 
     for fourmi in FOURMIS_SANS_RAU :
         FOURMIS_SANS_RAU.remove(fourmi)
         new_position = deplacement_une_fourmi(fourmi)
-        if ENVIRONNEMENT[new_position] == NOURRITURE :
-            print( "la fourmi",fourmi,"a bouffé en", new_position)
+        if ENVIRONNEMENT[new_position] == CODE_RAU :
+            print( "la fourmi",fourmi,"a récupéré de la bouffe en", new_position)
             FOURMIS_AVEC_RAU.append(new_position)
         else :
             FOURMIS_SANS_RAU.append(new_position)
@@ -313,7 +312,7 @@ while SIMULATION_EN_COURS :
     print("-------")
     deplacement_des_fourmis()
     affichage_graphique()
-    if not FOURMIS_SANS_RAU :
+    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand toutes les RAU sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmillière avec une RAU ?)
         SIMULATION_EN_COURS = False
     #FB A quoi servent les deux lignes précédentes ?
     plt.pause(TEMPS_PAUSE)
