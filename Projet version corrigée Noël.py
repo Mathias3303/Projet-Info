@@ -196,13 +196,13 @@ def poids_deplacement():
     for k in range(len(FOURMIS_AVEC_RAU)):
         case_actuelle = FOURMIS_AVEC_RAU[k]
         delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k] #couple_delta de l'actuel
-        voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , caseactuelle)
+        voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , case_actuelle)
         L_cos_voisins_praticables = []
         L_attractivite_des_voisins_praticables = []
         norme_vecteur_actuel = ( (delta_actuel[0])**2 + (delta_actuel[1])**2 )**(1/2)
 
         for case_possible in voisins_praticables :
-            delta_case_possible = couple_delta(case_possible, case_actuelle)
+            delta_possible = couple_delta(case_possible, case_actuelle)
             produit_scalaire = np.dot(delta_actuel, delta_case_possible)
             norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2)
             cos_case_possible = produit_scalaire / norme_vecteur_possible
