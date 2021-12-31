@@ -278,7 +278,7 @@ def ferme_fenetre(event) : # fonction appelée quand on ferme la fenêtre
 def affichage_graphique() :
     plt.cla() #FB à chaque nouvel affichage, Commencer par tout effacer
 
-    plt.imshow(ENVIRONNEMENT,cmap=CMAPU)  # on affiche le terrain
+    plt.imshow(ENVIRONNEMENT,cmap=CMAPU)  # On affiche le terrain
 
     # Puis on affiche les fourmis
 
@@ -309,9 +309,8 @@ while SIMULATION_EN_COURS :
     print("-------")
     deplacement_des_fourmis()
     affichage_graphique()
-    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand toutes les RAU sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmillière avec une RAU ?)
+    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand toutes les RAU sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
         SIMULATION_EN_COURS = False
-    #FB A quoi servent les deux lignes précédentes ?
     plt.pause(TEMPS_PAUSE)
 
 plt.show()
