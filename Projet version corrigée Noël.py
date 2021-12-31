@@ -52,7 +52,7 @@ INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
 
 SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cours (tant qu'elle vaut True, la boucle principale continue - elle devient False par exemple si on ferme la fenêtre grâce à un bout de code que je vous ai mis en cadeau bonus !)
 
-## UN EXEMPLE
+## UN EXEMPLE à généraliser
 
 # ENVIRONNEMENT : rectangle de maxX*maxY cases pratiquables
 
@@ -73,9 +73,6 @@ for coord in LISTE_POSITION_RAU :
     ENVIRONNEMENT[coord] = CODE_RAU
 
 ENVIRONNEMENT[(5,5)] = CODE_FOURMILIERE
-
-
-
 
 print(ENVIRONNEMENT)
 
@@ -118,8 +115,8 @@ def remplit_RAU_au_hasard(nbUnites) :
 
     if NB_RAU_INITIAL <= maxX*maxY:
         while Nb_RAU_placees < NB_RAU_INITIAL:
-            xRAU = randint(1,maxX)
-            yRAU = randint(1,maxY)
+            xRAU = random.randint(1,maxX)
+            yRAU = random.randint(1,maxY)
             positionRAU = (xRAU,yRAU)
             if ENVIRONNEMENT[positionRAU] == CODE_PRATICABLE:
                 ENVIRONNEMENT[positionRAU] = CODE_RAU
