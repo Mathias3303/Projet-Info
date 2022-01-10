@@ -2,8 +2,9 @@ import random
 import matplotlib as mpl
 import numpy as np
 import matplotlib.pyplot as plt
-from math import pi
+from math import pi,exp
 import matplotlib.colors as couleurs
+
 
 
 #FB Il y a parfois une petite erreur très subtile dans le mouvement des fourmis (rarement !). La verrez-vous ? =D
@@ -78,12 +79,12 @@ print(ENVIRONNEMENT)
 
 
 
-FOURMIS_SANS_RAU = [(5,5),(5,5),(5,5),(5,5),(5,5),(5,5),(5,5)]
+FOURMIS_SANS_RAU = [(5,5),(5,5),(5,5)]
 FOURMIS_AVEC_RAU = []
 
 
-
-VECTEUR_VITESSE_FOURMIS_AVEC_RAU = [] #à supprimer ? ancien chemin pour le déplacement choisi
+ALPHA_DEPLACEMENT = 1 #variable caractérisant la préférence au déplacement
+VECTEUR_VITESSE_FOURMIS_AVEC_RAU = [(1,1), (2,1), (1,0)] #à supprimer ? ancien chemin pour le déplacement choisi
 
 
 TEMPS_PAUSE = 1 #nani ?
@@ -178,15 +179,49 @@ def deplacement_aleatoire() :
 #FB Avec le setting graphique que je vous ai mis, vous allez pouvoir les tester vous-même et voir si ça fait ce que vous voulez.
 
 def couple_delta(case_suivante , case_actuelle):
+    '''renvoie un vecteur vitesse instantanée entre 2 cases traversées successives'''
     di = case_suivante[0] - case_actuelle[0]
     dj = case_suivante[1] - case_actuelle[1]
     couple_delta = ( di , dj )
     return couple_delta
 
 
+def cos(delta_actuel, delta_possible) :
+    produit_scalaire = np.dot(delta_actuel, delta_possible) #produit scalaire entre vecteur avant et vecteur suivant
+    norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2) #norme du vecteur vitesse qui pointe vers une case possible
+    norme_vecteur_actuel = ( (delta_actuel[0])**2 + (delta_actuel[1])**2 )**(1/2)
+    cos_case_possible = produit_scalaire / (norme_vecteur_possible*norme_vecteur_actuel) #on divise par la norme pour isoler cos
+    return cos_case_possible
+
+##def poids_deplacement_une_fourmi(fourmi):
+    #!!!! CORRECTION NECESSAIRE !!!!
+    global ALPHA_DEPLACEMENT
+
+    case_actuelle = fourmi
+    delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k] #couple_delta de l'actuel
+    voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , case_actuelle)
+    L_cos_voisins_praticables = []
+    L_attractivite_des_voisins_praticables = []
 
 
-def poids_deplacement():
+    for case_possible in voisins_praticables :
+        delta_possible = couple_delta(case_possible, case_actuelle) #vecteur vitesse de case actuelle à case possible
+
+
+        L_cos_voisins_praticables.append(cos_case_possible) #liste des cos de l'angle formé par les vecteurs actuel et possible
+        print(L_cos_voisins_praticables)
+
+    for cos in L_cos_voisins_praticables :
+        L_attractivite_des_voisins_praticables.append(exp(ALPHA_DEPLACEMENT*cos))
+
+    print(L_attractivite)
+##
+
+
+def poids_deplacement_des_fourmis():
+
+    global ALPHA_DEPLACEMENT
+
     for k in range(len(FOURMIS_AVEC_RAU)):
         case_actuelle = FOURMIS_AVEC_RAU[k]
         delta_actuel = VECTEUR_VITESSE_FOURMIS_AVEC_RAU[k] #couple_delta de l'actuel
@@ -196,28 +231,31 @@ def poids_deplacement():
         norme_vecteur_actuel = ( (delta_actuel[0])**2 + (delta_actuel[1])**2 )**(1/2)
 
         for case_possible in voisins_praticables :
-            delta_possible = couple_delta(case_possible, case_actuelle)
-            produit_scalaire = np.dot(delta_actuel, delta_case_possible)
-            norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2)
-            cos_case_possible = produit_scalaire / norme_vecteur_possible
-            L_cos_voisins_praticables.append(cos_case_possible)
+            delta_possible = couple_delta(case_possible, case_actuelle) #vecteur vitesse de case actuelle à case possible
+            produit_scalaire = np.dot(delta_actuel, delta_possible) #produit scalaire entre vecteur avant et vecteur suivant
+            norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2) #norme du vecteur vitesse qui pointe vers une case possible
+            cos_case_possible = produit_scalaire / (norme_vecteur_possible*norme_vecteur_actuel) #on divise par la norme pour isoler cos
 
-        for element in L_cos_voisins_praticables :
-            if element == 0 :
-                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_0)
-            if element == pi/4 or element == -pi/4 :
-                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PId4)
-            if element == pi/2 or element == -pi/2 :
-                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PId2)
-            if element == 3*pi/4 or element == -3*pi/4 :
-                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_3PId4)
-            if element == pi or element == -pi :
-                L_attractivite_des_voisins_praticables.append(INFLUENCE_COS_PI)
+            L_cos_voisins_praticables.append(cos_case_possible) #liste des cos de l'angle formé par les vecteurs actuel et possible
+            print(L_cos_voisins_praticables)
+
+    for cos in L_cos_voisins_praticables :
+        L_attractivite_des_voisins_praticables.append(exp(ALPHA_DEPLACEMENT*cos))
+
+    print(L_attractivite)
+
+
+
+
+
+
+
+#def poids_deplacement_des_fourmis():
 
 
 ## Deplacement des fourmis
 
-def deplacement_une_fourmi(fourmi) :
+def deplacement_aleatoire_une_fourmi(fourmi) :
     '''
     pour le moment, chaque fourmi se promène aléatoirement
     '''
@@ -238,26 +276,32 @@ def deplacement_des_fourmis() :
     global FOURMIS_AVEC_RAU, FOURMIS_SANS_RAU
 
 
-    #FB Comprenez-vous la différence de traitement ci-dessous entre fourmis avec et sans RAU ? Notamment, y a-t-il une importance à traiter d'abord les fourmis avec RAU ou est-ce indifférent ?
+    L_provisoire_AVEC_RAU = [] #création de listes de stockage provisoires
+    L_provisoire_SANS_RAU = []
 
-
-    for fourmi in FOURMIS_AVEC_RAU :
-        FOURMIS_AVEC_RAU.remove(fourmi)
-        new_position = deplacement_une_fourmi(fourmi)
+    for fourmi in FOURMIS_AVEC_RAU:
+        new_position = deplacement_aleatoire_une_fourmi(fourmi)
         if ENVIRONNEMENT[new_position] == CODE_FOURMILIERE :
             print( "la fourmi", fourmi, "a rempli son quota")
             NB_RAU_COLLECTEES += 1
         else :
-            FOURMIS_AVEC_RAU.append(deplacement_une_fourmi(fourmi))
+            L_provisoire_AVEC_RAU.append(new_position)
+
 
     for fourmi in FOURMIS_SANS_RAU :
-        FOURMIS_SANS_RAU.remove(fourmi)
-        new_position = deplacement_une_fourmi(fourmi)
+        new_position = deplacement_aleatoire_une_fourmi(fourmi)
         if ENVIRONNEMENT[new_position] == CODE_RAU :
             print( "la fourmi",fourmi,"a récupéré de la bouffe en", new_position)
-            FOURMIS_AVEC_RAU.append(new_position)
+            L_provisoire_AVEC_RAU.append(new_position)
         else :
-            FOURMIS_SANS_RAU.append(new_position)
+            L_provisoire_SANS_RAU.append(new_position)
+
+
+    FOURMIS_AVEC_RAU = L_provisoire_AVEC_RAU
+    FOURMIS_SANS_RAU = L_provisoire_SANS_RAU
+
+
+
 
 
 
