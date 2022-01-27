@@ -60,18 +60,18 @@ SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cou
 ## liées à l'interprétation de l'inertie
 
 EPSILON_COS = 0.001
-INFLUENCE_COS_0 = 5
-INFLUENCE_COS_PId4 = 3
-INFLUENCE_COS_PId2 = 2
-INFLUENCE_COS_3PId4 = 1
-INFLUENCE_COS_PI = 0
+INFLUENCE_COS_0 = 8
+INFLUENCE_COS_PId4 = 5
+INFLUENCE_COS_PId2 = 3
+INFLUENCE_COS_3PId4 = 2
+INFLUENCE_COS_PI = 1
 
 
 VECTEUR_VITESSE_FOURMIS_SANS_RAU = [(1,1), (-1,1), (1,0)]
 VECTEUR_VITESSE_FOURMIS_AVEC_RAU = []
 
 
-ALPHA_INERTIE = 10 #variable caractérisant la préférence au déplacement (même chose avec ALPHA_PHEROMONE)
+ALPHA_INERTIE = 0.001 #variable caractérisant la préférence au déplacement
 
 
 INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
@@ -108,7 +108,7 @@ ENVIRONNEMENT[0,:] = CODE_OBSTACLE
 ENVIRONNEMENT[maxX+1,:] = CODE_OBSTACLE
 ENVIRONNEMENT[:,maxY+1] = CODE_OBSTACLE
 
-LISTE_POSITION_RAU = [(2,2),(9,6), (5,9)]
+LISTE_POSITION_RAU = [(2,2),(10,10), (5,8)]
 
 for coord in LISTE_POSITION_RAU :
     ENVIRONNEMENT[coord] = CODE_RAU
@@ -169,28 +169,46 @@ def remplit_RAU_au_hasard(nbUnites) :
                 Nb_RAU_placees += 1
 
     else:
-        print('Pas assez de place dans E pour autant de RAU')
+        print('Pas assez de place dans ENVIRONNEMENT pour autant de RAU')
 
 
-def remplit_obstacles_au_hasard(nbObstacles) :
+
+def remplit_Obstacles_au_hasard(nbUnites) :
     '''
     met nbObstacles obstacles dans la variable ENVIRONNEMENT
     '''
+
+    Nb_Obstacles = nbUnites # faire une variable globale ?
+    Nb_Obstacles_places = 0
+    positionsObstacles = []
+
+    if Nb_Obstacles <= maxX*maxY :
+        while Nb_Obstacles_places < Nb_Obstacles :  #for k in range(nbObstacles) :
+            xObs = randint(1, maxX)
+            yObs = randint(1, maxY)
+            positionsObstacles.append((xObs, yObs))
+            for l in positionsObstacles :
+                if ENVIRONNEMENT[l] ==  CODE_PRATICABLE :
+                    ENVIRONNEMENT[l] = CODE_OBSTACLE
+                    Nb_Obstacles_places += 1
+    else :
+        print('Pas assez de place dans ENVIRONNEMENT pour autant d obstacles')
+
 
     # à insérer sur github
 
 
 
-## liste des voisins praticables
+## liste des voisins praticables ATTENTION MODIFICATION IMPORTANTE !
 
-def liste_des_voisins_praticables(tableau,case):
-    '''Renvoie liste des coordonnees des cases accessibles, c'est ) dire sur le tableau et sans obstacle'''
+def liste_des_voisins_praticables(case):
+    '''Renvoie liste des coordonnees des cases accessibles en partant d'une autre case, c'est à dire celles qui lui sont adjacentes (dont diagonales) et praticables'''
     i = case[0]
     j = case[1]
     voisins_potentiels = [(i-1,j-1),(i-1,j),(i-1,j+1),(i,j+1),(i+1,j+1),(i+1,j),(i+1,j-1),(i,j-1)] # parcours d'en haut à gauche, dans le sens horaire
     indice_voisins_praticables = []
     for candidat in voisins_potentiels:
-        if (0 <= candidat[0] < tableau.shape[0]) and (0 <= candidat[1] < tableau.shape[1]) and (tableau[candidat] != CODE_OBSTACLE ):
+        if (0 <= candidat[0] < ENVIRONNEMENT.shape[0]) and (0 <= candidat[1] < ENVIRONNEMENT.shape[1]) and (ENVIRONNEMENT[candidat] != CODE_OBSTACLE ):
             indice_voisins_praticables.append(candidat)
     return indice_voisins_praticables
 
@@ -249,7 +267,7 @@ def attractivite_inertie_une_fourmi(fourmi):
 
     case_actuelle = fourmi
     delta_actuel = VECTEUR_VITESSE_FOURMIS_SANS_RAU[0] #couple_delta de l'actuel ATTENTION NE TRAITE QU'UN GROUPE DE FOURMIS
-    voisins_praticables = liste_des_voisins_praticables(ENVIRONNEMENT , case_actuelle)
+    voisins_praticables = liste_des_voisins_praticables(case_actuelle)
     L_cos_voisins_praticables = []
     L_attractivite_inertie_des_voisins_praticables = []
 
@@ -298,7 +316,7 @@ def deplacement_inertie_et_pheromones_une_fourmi(fourmi):
     chaque fourmi se déplace selon son inertie et les phéromones alentours
     '''
 
-    cases_possibles = liste_des_voisins_praticables(ENVIRONNEMENT,fourmi)
+    cases_possibles = liste_des_voisins_praticables(fourmi)
 
     attractivite_inertie = attractivite_inertie_une_fourmi(fourmi)
     #attractivite_pheromones = attractivite_pheromones_une_fourmi(fourmi)
@@ -319,7 +337,7 @@ def deplacement_aleatoire_une_fourmi(fourmi) :
     '''
     chaque fourmi se promène aléatoirement
     '''
-    nouvelle_case = random.choice(liste_des_voisins_praticables(ENVIRONNEMENT,fourmi))
+    nouvelle_case = random.choice(liste_des_voisins_praticables(fourmi))
     print("la fourmi", fourmi,"va en ", nouvelle_case)
     return nouvelle_case
 
