@@ -319,6 +319,8 @@ def deplacement_inertie_et_pheromones_une_fourmi(fourmi):
     attractivite_inertie = attractivite_inertie_une_fourmi(fourmi)
     attractivite_pheromone = attractivite_pheromone_une_fourmi(fourmi)
 
+
+
     attractivite_inertie_softmax = [exp(ALPHA_INERTIE*attractivite_inertie[i] + ALPHA_PHEROMONE*attractivite_pheromone[i]) for i in range(8)]
 
     nouvelle_case = random.choices(cases_possibles , attractivite_inertie_softmax ) # choix pondéré par les attractivités ATTENTION C'EST UN ARRAY
