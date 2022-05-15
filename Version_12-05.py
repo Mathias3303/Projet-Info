@@ -8,9 +8,13 @@ import matplotlib.pyplot as plt
 from math import pi,exp,cos
 import matplotlib.colors as couleurs
 
+
+
+
 ### VARIABLES GLOBALES
 
 ## pour l'affichage graphique
+
 
 # blanc pour les cases vides
 # gris pour les obstacles
@@ -33,12 +37,14 @@ CODE_RAU = 2
 CODE_FOURMILIERE = 3
 CODE_PHEROMONE = 4
 
+
 ## pour l'arrêt ou la poursuite de la simulation
 
 NB_RAU_INITIAL = 3 #ici, test manuel ; à implémenter dans remplit_RAU_au_hasard
 NB_RAU_COLLECTEES = 0 #idee booleen compteur de RAU rentrées à la maison qui acheve le programme (while), cf. dernière fonction
 
 SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cours (tant qu'elle vaut True, la boucle principale continue - elle devient False par exemple si on ferme la fenêtre grâce à un bout de code que je vous ai mis en cadeau bonus !)
+
 
 ## liées à l'interprétation de l'inertie
 
@@ -49,15 +55,29 @@ INFLUENCE_COS_PId2 = 3
 INFLUENCE_COS_3PId4 = 2
 INFLUENCE_COS_PI = 1
 
+
+
 ALPHA_INERTIE = 0.6 #variable caractérisant la préférence au déplacement
 
+
 INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
+
 
 ## liées à l'interprétation des phéromones
 
 ALPHA_PHEROMONE = 2
 
+
+
+
+
+
+
+
+
 ### DEFINITION DE L'ENVIRONNEMENT
+
+
 
 # ENVIRONNEMENT : rectangle de maxX*maxY cases pratiquables
 
@@ -71,6 +91,7 @@ ENVIRONNEMENT[:,0] = CODE_OBSTACLE
 ENVIRONNEMENT[0,:] = CODE_OBSTACLE
 ENVIRONNEMENT[maxX+1,:] = CODE_OBSTACLE
 ENVIRONNEMENT[:,maxY+1] = CODE_OBSTACLE
+
 
 LISTE_POSITION_RAU = [ (40,5) , (41,5) , (40,6) , (42,5) , (42,6) , (40,4) , (41,4) , (42,4) , (39,5) , (39,6) , (39,7) , (38,5) , (38,6) , (38,4) ]
 
@@ -88,9 +109,13 @@ ENVIRONNEMENT[(40,40)] = CODE_FOURMILIERE
 
 print(ENVIRONNEMENT)
 
+
 FOURMIS = [[(40,40) , False , (-1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] ] #[coordonnées , Rau ou pas, vecteur déplacement ] pour chaque fourmi
 
+
 TEMPS_PAUSE = 0.1 # caractérise la vitesse des fourmis (cf.tout en bas)
+
+
 
 # mettre plus tard : remplit_RAU_au_hasard(x) , remplit_obstacles_au_hasard(x)
 
@@ -98,7 +123,10 @@ TEMPS_PAUSE = 0.1 # caractérise la vitesse des fourmis (cf.tout en bas)
 
 ENVIRONNEMENT_PHEROMONES = ENVIRONNEMENT
 
+
+
 ### FONCTIONS UTILITAIRES
+
 
 ## fonctions liées à l'environnement
 
@@ -125,6 +153,8 @@ def remplit_RAU_au_hasard(nbUnites) :
     else:
         print('Pas assez de place dans ENVIRONNEMENT pour autant de RAU')
 
+
+
 def remplit_Obstacles_au_hasard(nbUnites) :
     '''
     met nbObstacles obstacles dans la variable ENVIRONNEMENT
@@ -146,7 +176,10 @@ def remplit_Obstacles_au_hasard(nbUnites) :
     else :
         print('Pas assez de place dans ENVIRONNEMENT pour autant d obstacles')
 
+
     # à insérer sur github
+
+
 
 ## liste des voisins praticables ATTENTION MODIFICATION IMPORTANTE !
 
@@ -161,6 +194,8 @@ def liste_des_voisins_praticables(case):
             indice_voisins_praticables.append(candidat)
     return indice_voisins_praticables
 
+
+
 ## fonctions de calculs
 
 def couple_delta(case_suivante , case_actuelle):
@@ -172,11 +207,13 @@ def couple_delta(case_suivante , case_actuelle):
     couple_delta = ( di , dj )
     return couple_delta
 
+
 def cos_des_deltas(delta_actuel, delta_possible) :
     produit_scalaire = np.dot(delta_actuel, delta_possible) # produit scalaire entre vecteur avant et vecteur suivant
     norme_vecteur_possible =( (delta_possible[0])**2 + (delta_possible[1])**2 )**(1/2) # norme du vecteur vitesse qui pointe vers une case possible
     norme_vecteur_actuel = ( (delta_actuel[0])**2 + (delta_actuel[1])**2 )**(1/2)
     cos_case_possible = produit_scalaire / (norme_vecteur_possible*norme_vecteur_actuel) # on divise par la norme pour isoler cos
+
 
     # arrondissement des valeurs de cos obtenues :
 
@@ -197,12 +234,18 @@ def cos_des_deltas(delta_actuel, delta_possible) :
 
     return cos_case_possible
 
+
+
+
 ### FONCTIONS DE DEPLACEMENT
 
 ## ATTRACTIVITES
 
 def mouvement_ini() :
     return (randint(-1,1),randint(-1,1))
+
+
+
 
 def attractivite_pheromone_une_fourmi(fourmi) :
     ''' renvoie la liste des attractivités des cases praticables (valeurs arbitraires) liées aux phéromones pour la fourmi concernée, prend argument un TRIPLET
@@ -220,16 +263,20 @@ def attractivite_pheromone_une_fourmi(fourmi) :
 
     return L_attractivite_pheromone_des_voisins_praticables
 
+
+
 def attractivite_inertie_une_fourmi(fourmi):
     '''
     renvoie la liste des attractivités des  praticables (valeurs arbitraires) liées à l'inertie de la fourmi concernée, prend argument un TRIPLET
     '''
+
 
     case_actuelle = fourmi[0]
     delta_actuel = fourmi[2] # couple_delta de l'actuel ATTENTION NE TRAITE QU'UN GROUPE DE FOURMIS
     voisins_praticables = liste_des_voisins_praticables(case_actuelle)
     L_cos_voisins_praticables = []
     L_attractivite_inertie_des_voisins_praticables = []
+
 
     for case_possible in voisins_praticables :
         delta_possible = couple_delta(case_possible, case_actuelle) #vecteur vitesse de case actuelle à case possible
@@ -255,6 +302,10 @@ def attractivite_inertie_une_fourmi(fourmi):
 
     return L_attractivite_inertie_des_voisins_praticables
 
+
+
+
+
 ## DEPLACEMENT
 
 def deplacement_aleatoire_une_fourmi(fourmi) :
@@ -264,6 +315,8 @@ def deplacement_aleatoire_une_fourmi(fourmi) :
     nouvelle_case = random.choice(liste_des_voisins_praticables(fourmi[0]))
     print("la fourmi", fourmi[0],"va en ", nouvelle_case)
     return nouvelle_case
+
+
 
 def deplacement_inertie_une_fourmi(fourmi):
     '''
@@ -286,10 +339,13 @@ def deplacement_inertie_une_fourmi(fourmi):
 
     return nouvelle_case[0]
 
+
+
 def deplacement_inertie_et_pheromones_une_fourmi(fourmi):
     '''
     chaque fourmi se déplace selon son inertie et les phéromones alentours, la fonction prend en argument un TRIPLET
     '''
+
 
     cases_possibles = liste_des_voisins_praticables(fourmi[0])
 
@@ -308,6 +364,12 @@ def deplacement_inertie_et_pheromones_une_fourmi(fourmi):
 
     return nouvelle_case[0]
 
+
+
+
+
+
+
 def deplacement_des_fourmis() :
 
     '''
@@ -323,6 +385,7 @@ def deplacement_des_fourmis() :
 
         past_position = fourmi[0]
 
+
         if fourmi[1]: # fourmis avec RAU
 
             new_position = deplacement_inertie_et_pheromones_une_fourmi(fourmi) # on peut intervertir 'aleatoire', 'inertie' et 'inertie_et_pheromones'
@@ -336,6 +399,7 @@ def deplacement_des_fourmis() :
 
                 FOURMIS_provisoire.append(fourmi)
 
+
         if not fourmi[1]: # fourmis sans RAU
 
             new_position = deplacement_inertie_une_fourmi(fourmi) # on peut intervertir 'aleatoire', 'inertie' et 'inertie_et_pheromones'
@@ -343,6 +407,7 @@ def deplacement_des_fourmis() :
                 print( "la fourmi",fourmi,"a récupéré de la bouffe en", new_position)
                 fourmi[0] = new_position
                 fourmi[1] = True
+
 
             else :
                 fourmi[0] = new_position
@@ -354,8 +419,15 @@ def deplacement_des_fourmis() :
 
             FOURMIS_provisoire.append(fourmi)
 
+
+
     FOURMIS = FOURMIS_provisoire
     print([fourmi[2] for fourmi in FOURMIS])
+
+
+
+
+
 
 ### GESTION ET AFFICHAGE SIMULATION
 
@@ -365,6 +437,7 @@ def ferme_fenetre(event) : # fonction appelée quand on ferme la fenêtre
     global SIMULATION_EN_COURS
 
     SIMULATION_EN_COURS = False
+
 
 def affichage_graphique() :
     plt.cla() #FB à chaque nouvel affichage, Commencer par tout effacer
@@ -379,10 +452,13 @@ def affichage_graphique() :
     liste_i = [fourmi[0] for fourmi in FOURMIS_AVEC_RAU]
     liste_j = [fourmi[1] for fourmi in FOURMIS_AVEC_RAU]
 
+
     plt.scatter(liste_j , liste_i,color = COULEUR_FOURMI_AVEC_RAU, s = 50, marker = 'o' )
+
 
     liste_i = [fourmi[0] for fourmi in FOURMIS_SANS_RAU]
     liste_j = [fourmi[1] for fourmi in FOURMIS_SANS_RAU]
+
 
     plt.scatter(liste_j , liste_i, color = COULEUR_FOURMI_SANS_RAU, s = 50, marker = 'o')
 
@@ -392,7 +468,12 @@ def affichage_graphique() :
 
     plt.draw()
 
+
+
+
+
 ## Initialisation de Matplotlib et Boucle Principale
+
 
 fig, ax = plt.subplots()
 
@@ -408,5 +489,6 @@ while SIMULATION_EN_COURS :
     plt.pause(TEMPS_PAUSE)
 
 plt.show()
+
 
 #Si on met un fort ALPHA_PHEROMONE personne va vouloir rentrer à la fourmilière elles vont juste tourner autour
