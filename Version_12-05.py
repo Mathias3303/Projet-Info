@@ -49,15 +49,15 @@ SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cou
 ## liées à l'interprétation de l'inertie
 
 EPSILON_COS = 0.001
-INFLUENCE_COS_0 = 8
-INFLUENCE_COS_PId4 = 5
+INFLUENCE_COS_0 = 10
+INFLUENCE_COS_PId4 = 6
 INFLUENCE_COS_PId2 = 3
 INFLUENCE_COS_3PId4 = 2
 INFLUENCE_COS_PI = 1
 
 
 
-ALPHA_INERTIE = 0.6 #variable caractérisant la préférence au déplacement
+ALPHA_INERTIE = 0.75 #variable caractérisant la préférence au déplacement
 
 
 INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
@@ -65,7 +65,10 @@ INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
 
 ## liées à l'interprétation des phéromones
 
-ALPHA_PHEROMONE = 2
+ALPHA_PHEROMONE = 2.5
+
+TIMER = 0
+TIMER_PHEROMONE = 50 #temps avant arrêt de l'émission des phéromones
 
 
 
@@ -184,7 +187,7 @@ def remplit_Obstacles_au_hasard(nbUnites) :
 ## liste des voisins praticables ATTENTION MODIFICATION IMPORTANTE !
 
 def liste_des_voisins_praticables(case):
-    '''Renvoie liste des coordonnees des cases accessibles en partant d'une autre case, c'est à dire celles qui lui sont adjacentes (dont diagonales) et praticables'''
+    '''Renvoie liste des coordonnees des cases accessibles en partant d'une autre CASE, c'est à dire celles qui lui sont adjacentes (dont diagonales) et praticables'''
     i = case[0]
     j = case[1]
     voisins_potentiels = [(i-1,j-1),(i-1,j),(i-1,j+1),(i,j+1),(i+1,j+1),(i+1,j),(i+1,j-1),(i,j-1)] # parcours d'en haut à gauche, dans le sens horaire
@@ -388,6 +391,11 @@ def deplacement_des_fourmis() :
 
         if fourmi[1]: # fourmis avec RAU
 
+            #for case in liste_des_voisins_praticables(fourmi[0]):    AUTOMATISATION DE LA RENTRÉE DANS LA FOURMILIERE
+             #   if ENVIRONNEMENT[case] == CODE_FOURMILIERE:
+              #      new_position = case
+               #     break
+
             new_position = deplacement_inertie_et_pheromones_une_fourmi(fourmi) # on peut intervertir 'aleatoire', 'inertie' et 'inertie_et_pheromones'
             if ENVIRONNEMENT[new_position] == CODE_FOURMILIERE :
                 print( "la fourmi", fourmi, "a rempli son quota")
@@ -414,7 +422,7 @@ def deplacement_des_fourmis() :
 
             fourmi[2] = couple_delta( new_position , past_position )
 
-            if ENVIRONNEMENT[new_position] != CODE_FOURMILIERE :
+            if ENVIRONNEMENT[new_position] != CODE_FOURMILIERE and ENVIRONNEMENT[new_position] != CODE_RAU and TIMER <= TIMER_PHEROMONE :
                 ENVIRONNEMENT[new_position] = CODE_PHEROMONE
 
             FOURMIS_provisoire.append(fourmi)
@@ -422,7 +430,7 @@ def deplacement_des_fourmis() :
 
 
     FOURMIS = FOURMIS_provisoire
-    print([fourmi[2] for fourmi in FOURMIS])
+    #print([fourmi[2] for fourmi in FOURMIS]) CONTRÔLE ANCIEN, à supprimer ?
 
 
 
@@ -464,7 +472,7 @@ def affichage_graphique() :
 
     plt.axis('equal')
 
-    #plt.show() #FB Attention, le plt.show() doit en fait se trouver ailleurs (à la fin de la boucle principale), ici on va utiliser :
+    #plt.show() #FB Attention, le plt.show() doit en fait se trouver ailleurs (à la fin de la boucle principale), ici on va utiliser : # COMMENTAIRE SUPPRIMABLE
 
     plt.draw()
 
@@ -483,8 +491,9 @@ while SIMULATION_EN_COURS :
     print("-------")
     affichage_graphique()
     deplacement_des_fourmis()
+    TIMER += 1
 
-    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand toutes les RAU sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
+    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand x sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
         SIMULATION_EN_COURS = False
     plt.pause(TEMPS_PAUSE)
 
