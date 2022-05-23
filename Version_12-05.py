@@ -1,5 +1,3 @@
-
-
 import random
 from random import randint
 import matplotlib as mpl
@@ -116,7 +114,7 @@ print(ENVIRONNEMENT)
 FOURMIS = [[(40,40) , False , (-1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] ] #[coordonnées , Rau ou pas, vecteur déplacement ] pour chaque fourmi
 
 
-TEMPS_PAUSE = 0.1 # caractérise la vitesse des fourmis (cf.tout en bas)
+TEMPS_PAUSE = 0.001 # caractérise la vitesse des fourmis (cf.tout en bas)
 
 
 
@@ -124,7 +122,7 @@ TEMPS_PAUSE = 0.1 # caractérise la vitesse des fourmis (cf.tout en bas)
 
 # ENVIRONNEMENT PHEROMONES
 
-ENVIRONNEMENT_PHEROMONES = ENVIRONNEMENT
+ENVIRONNEMENT_PHEROMONES = np.zeros((maxX+2,maxY+2))
 
 
 
@@ -448,9 +446,11 @@ def ferme_fenetre(event) : # fonction appelée quand on ferme la fenêtre
 
 
 def affichage_graphique() :
-    plt.cla() #FB à chaque nouvel affichage, Commencer par tout effacer
+    ax1.cla() #FB à chaque nouvel affichage, Commencer par tout effacer
 
-    plt.imshow(ENVIRONNEMENT,cmap=CMAPU)  # On affiche le terrain
+    ax1.axis('off')
+
+    ax1.imshow(ENVIRONNEMENT,cmap=CMAPU)  # On affiche le terrain
 
     FOURMIS_AVEC_RAU = [fourmi[0] for fourmi in FOURMIS if fourmi[1]] # positions des fourmis avec RAU
     FOURMIS_SANS_RAU = [fourmi[0] for fourmi in FOURMIS if not fourmi[1]] # positions des fourmis sans RAU
@@ -461,16 +461,25 @@ def affichage_graphique() :
     liste_j = [fourmi[1] for fourmi in FOURMIS_AVEC_RAU]
 
 
-    plt.scatter(liste_j , liste_i,color = COULEUR_FOURMI_AVEC_RAU, s = 50, marker = 'o' )
+    ax1.scatter(liste_j , liste_i,color = COULEUR_FOURMI_AVEC_RAU, s = 50, marker = 'o' )
 
 
     liste_i = [fourmi[0] for fourmi in FOURMIS_SANS_RAU]
     liste_j = [fourmi[1] for fourmi in FOURMIS_SANS_RAU]
 
 
-    plt.scatter(liste_j , liste_i, color = COULEUR_FOURMI_SANS_RAU, s = 50, marker = 'o')
+    ax1.scatter(liste_j , liste_i, color = COULEUR_FOURMI_SANS_RAU, s = 50, marker = 'o')
 
-    plt.axis('equal')
+    ax1.axis('equal')
+
+    ax2.cla() # "efface les axes courants" : cela efface l'ancienne position des fourmis
+
+    ax2.axis('off')  #supprime les axes du tableau
+
+    ax2.imshow(ENVIRONNEMENT_PHEROMONES)
+
+
+
 
     #plt.show() #FB Attention, le plt.show() doit en fait se trouver ailleurs (à la fin de la boucle principale), ici on va utiliser : # COMMENTAIRE SUPPRIMABLE
 
@@ -483,7 +492,7 @@ def affichage_graphique() :
 ## Initialisation de Matplotlib et Boucle Principale
 
 
-fig, ax = plt.subplots()
+fig, (ax1, ax2) = plt.subplots(1, 2)
 
 fig.canvas.mpl_connect('close_event', ferme_fenetre)
 
