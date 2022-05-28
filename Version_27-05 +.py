@@ -19,7 +19,7 @@ import matplotlib.colors as couleurs
 # vert pour la / les fourmilières
 # rouge pour les stocks de nourriture
 
-COULEURS = ["white","grey", "green", "red", "blue"]
+COULEURS = ["white","grey", "green", "red"]
 CMAPU = couleurs.ListedColormap(COULEURS)
 
 # Les fourmis auront aussi leurs couleurs suivant qu'elles sont "à vide" ou "portent un RAU"
@@ -33,7 +33,7 @@ CODE_OBSTACLE = 1
 CODE_PRATICABLE = 0
 CODE_RAU = 2
 CODE_FOURMILIERE = 3
-CODE_PHEROMONE = 4
+CODE_PHEROMONE = 50
 
 
 ## pour l'arrêt ou la poursuite de la simulation
@@ -55,7 +55,7 @@ INFLUENCE_COS_PI = 1
 
 
 
-ALPHA_INERTIE = 0.75 #variable caractérisant la préférence au déplacement
+ALPHA_INERTIE = 0.50 #variable caractérisant la préférence au déplacement
 
 
 INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
@@ -63,15 +63,12 @@ INFLUENCE_CASE = 1 #à supprimer ? ancien chemin pour le déplacement choisi
 
 ## liées à l'interprétation des phéromones
 
-ALPHA_PHEROMONE = 2.5
+ALPHA_PHEROMONE = 2.0
 
 TIMER = 0
-TIMER_PHEROMONE = 50 #temps avant arrêt de l'émission des phéromones
+TIMER_PHEROMONE = 300 #temps avant arrêt de l'émission des phéromones
 
-
-
-
-
+TAUX_DISP_PHEROMONE = 0.98
 
 
 
@@ -106,12 +103,16 @@ for k in range(3):
 for coord in LISTE_POSITION_RAU :
     ENVIRONNEMENT[coord] = CODE_RAU
 
-ENVIRONNEMENT[(40,40)] = CODE_FOURMILIERE
 
-print(ENVIRONNEMENT)
+ENVIRONNEMENT[(48,48)] = CODE_FOURMILIERE
+
+#print(ENVIRONNEMENT)
 
 
-FOURMIS = [[(40,40) , False , (-1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] , [(40,40) , False , (1,1)] ] #[coordonnées , Rau ou pas, vecteur déplacement ] pour chaque fourmi
+
+
+
+FOURMIS = [[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)],[ (48,48), False , (-1,1)]] #[coordonnées , Rau ou pas, vecteur déplacement ] pour chaque fourmi
 
 
 TEMPS_PAUSE = 0.001 # caractérise la vitesse des fourmis (cf.tout en bas)
@@ -123,7 +124,7 @@ TEMPS_PAUSE = 0.001 # caractérise la vitesse des fourmis (cf.tout en bas)
 # ENVIRONNEMENT PHEROMONES
 
 ENVIRONNEMENT_PHEROMONES = np.zeros((maxX+2,maxY+2))
-
+ENVIRONNEMENT_PHEROMONES[(48,48)] = 5* CODE_PHEROMONE
 
 
 ### FONCTIONS UTILITAIRES
@@ -178,7 +179,7 @@ def remplit_Obstacles_au_hasard(nbUnites) :
         print('Pas assez de place dans ENVIRONNEMENT pour autant d obstacles')
 
 
-    # à insérer sur github
+
 
 
 
@@ -242,11 +243,6 @@ def cos_des_deltas(delta_actuel, delta_possible) :
 
 ## ATTRACTIVITES
 
-def mouvement_ini() :
-    return (randint(-1,1),randint(-1,1))
-
-
-
 
 def attractivite_pheromone_une_fourmi(fourmi) :
     ''' renvoie la liste des attractivités des cases praticables (valeurs arbitraires) liées aux phéromones pour la fourmi concernée, prend argument un TRIPLET
@@ -257,8 +253,8 @@ def attractivite_pheromone_une_fourmi(fourmi) :
     L_attractivite_pheromone_des_voisins_praticables = []
 
     for case_possible in voisins_praticables :
-        if ENVIRONNEMENT[case_possible] == CODE_PHEROMONE :
-           L_attractivite_pheromone_des_voisins_praticables.append(ALPHA_PHEROMONE)
+        if ENVIRONNEMENT_PHEROMONES[case_possible] != 0 :
+           L_attractivite_pheromone_des_voisins_praticables.append( ENVIRONNEMENT_PHEROMONES[case_possible] )
         else :
             L_attractivite_pheromone_des_voisins_praticables.append(-10000)
 
@@ -309,12 +305,17 @@ def attractivite_inertie_une_fourmi(fourmi):
 
 ## DEPLACEMENT
 
+def mouvement_ini() :
+    return (randint(-1,1),randint(-1,1))
+
+
+
 def deplacement_aleatoire_une_fourmi(fourmi) :
     '''
     chaque fourmi se promène aléatoirement, la fonction prend en argument un TRIPLET
     '''
     nouvelle_case = random.choice(liste_des_voisins_praticables(fourmi[0]))
-    print("la fourmi", fourmi[0],"va en ", nouvelle_case)
+    #print("la fourmi", fourmi[0],"va en ", nouvelle_case)
     return nouvelle_case
 
 
@@ -335,8 +336,8 @@ def deplacement_inertie_une_fourmi(fourmi):
         attractivite_inertie_softmax.append( a )
 
     nouvelle_case = random.choices(cases_possibles , attractivite_inertie_softmax ) # choix pondéré par les attractivités ATTENTION C'EST UN ARRAY
-    print(nouvelle_case)
-    print("la fourmi", fourmi,"va en ", nouvelle_case)
+    #print(nouvelle_case)
+    #print("la fourmi", fourmi,"va en ", nouvelle_case)
 
     return nouvelle_case[0]
 
@@ -360,8 +361,8 @@ def deplacement_inertie_et_pheromones_une_fourmi(fourmi):
         attractivite_inertie_softmax.append( a + b )
 
     nouvelle_case = random.choices(cases_possibles , attractivite_inertie_softmax ) # choix pondéré par les attractivités ATTENTION C'EST UN ARRAY
-    print(nouvelle_case)
-    print("la fourmi", fourmi,"va en ", nouvelle_case)
+    #print(nouvelle_case)
+    #print("la fourmi", fourmi,"va en ", nouvelle_case)
 
     return nouvelle_case[0]
 
@@ -401,7 +402,7 @@ def deplacement_des_fourmis() :
             else :
                 fourmi[0] = new_position # on affecte la nouvelle position
                 fourmi[2] = couple_delta( new_position , past_position )
-                #ENVIRONNEMENT[new_position] = CODE_PHEROMONE
+                #ENVIRONNEMENT[new_position] = CODE_PHEROMONE # POUR AUTRE PHEROMONE
 
                 FOURMIS_provisoire.append(fourmi)
 
@@ -413,6 +414,7 @@ def deplacement_des_fourmis() :
                 print( "la fourmi",fourmi,"a récupéré de la bouffe en", new_position)
                 fourmi[0] = new_position
                 fourmi[1] = True
+                ENVIRONNEMENT[new_position] = CODE_PRATICABLE
 
 
             else :
@@ -420,8 +422,10 @@ def deplacement_des_fourmis() :
 
             fourmi[2] = couple_delta( new_position , past_position )
 
-            if ENVIRONNEMENT[new_position] != CODE_FOURMILIERE and ENVIRONNEMENT[new_position] != CODE_RAU and TIMER <= TIMER_PHEROMONE :
-                ENVIRONNEMENT[new_position] = CODE_PHEROMONE
+            if ENVIRONNEMENT[new_position] != CODE_FOURMILIERE and ENVIRONNEMENT[new_position] != CODE_RAU and TIMER <= TIMER_PHEROMONE and ENVIRONNEMENT_PHEROMONES[new_position] == 0 :
+                ENVIRONNEMENT_PHEROMONES[new_position] += CODE_PHEROMONE - TIMER*(CODE_PHEROMONE/TIMER_PHEROMONE)
+                for k in liste_des_voisins_praticables(new_position) :
+                    ENVIRONNEMENT_PHEROMONES[k] = CODE_PHEROMONE - TIMER*(CODE_PHEROMONE/TIMER_PHEROMONE)
 
             FOURMIS_provisoire.append(fourmi)
 
@@ -497,10 +501,12 @@ fig, (ax1, ax2) = plt.subplots(1, 2)
 fig.canvas.mpl_connect('close_event', ferme_fenetre)
 
 while SIMULATION_EN_COURS :
-    print("-------")
+    #print("-------")
     affichage_graphique()
     deplacement_des_fourmis()
     TIMER += 1
+    #ENVIRONNEMENT_PHEROMONES *= TAUX_DISP_PHEROMONE
+
 
     if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand x sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
         SIMULATION_EN_COURS = False
@@ -510,3 +516,8 @@ plt.show()
 
 
 #Si on met un fort ALPHA_PHEROMONE personne va vouloir rentrer à la fourmilière elles vont juste tourner autour
+
+
+##
+#dans fonction deplacement : codepheromone*tauxdisp
+#dans boucle finale : timer pour arreter emission au bout d'un moment
