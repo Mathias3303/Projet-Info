@@ -30,9 +30,9 @@ TIMER_NEW_ANT = 10 # Nb itérations de la boucles principale entre l'apparition 
 
 TAUX_DISP_PHEROMONE = 0.96
 
-TEMPS_PAUSE = 0.001 # vitesse d'affichage(cf.tout en bas)
+TEMPS_PAUSE = 0.001 # vitesse d'affichage (cf.tout en bas)
 
-MAX_ODEUR_FOURMILLIERE = 3 # valeur centrale de l'odeur de la fourmilière
+MAX_ODEUR_FOURMILIERE = 3 # valeur centrale de l'odeur de la fourmilière
 
 DECROISSANCE_ODEUR_FOURMILIERE = 0.95
 
@@ -96,7 +96,8 @@ TABLO_PHERO_ALLER = np.zeros((maxX+2,maxY+2))
 
 TABLO_PHERO_RETOUR_VARIABLE = np.zeros((maxX+2,maxY+2))
 
-TABLO_PHERO_RETOUR_FIXE = TABLO_PHERO_RETOUR.copy()
+
+TABLO_PHERO_RETOUR_FIXE = TABLO_PHERO_RETOUR_VARIABLE.copy()
 
 
 def distance(case1,case2) :
@@ -106,7 +107,7 @@ def distance(case1,case2) :
 
 for i in range (maxX+2) :
     for j in range(maxY+2) :
-        TABLO_PHERO_RETOUR_FIXE [i,j] = MAX_ODEUR_FOURMILLIERE*DECROISSANCE_ODEUR_FOURMILIERE**distance((i,j),CASE_FOURMILIERE)
+        TABLO_PHERO_RETOUR_FIXE [i,j] = MAX_ODEUR_FOURMILIERE*DECROISSANCE_ODEUR_FOURMILIERE**distance((i,j),CASE_FOURMILIERE)
 
 TABLO_PHERO_RETOUR = TABLO_PHERO_RETOUR_VARIABLE + TABLO_PHERO_RETOUR_FIXE
 
@@ -223,7 +224,7 @@ def probas_mouvement_une_fourmi (fourmi, cases_voisines, tablo_type_pheromone, a
     - une fourmi
     - la liste des cases voisines (pas la peine de la calculer plusieurs fois)
     - le tableau correspondant au type de phéromones auxquelles cette fourmi est sensible (aller/retour)
-    - le poids de l'inertie pour cette fourmie
+    - le poids de l'inertie pour cette fourmi
     - le poids des pheromones
 
     renvoie la liste des probas pour chaque case voisine
@@ -280,7 +281,7 @@ def deplacement_des_fourmis() :
         fourmi = FOURMIS[indice_fourmi]
         new_position = deplace_une_fourmi(fourmi)
 
-        # gestion des cas particuliers : changement d'état, retour fourilière
+        # gestion des cas particuliers : changement d'état, retour fourmilière
 
         if fourmi[1] and new_position == CASE_FOURMILIERE :
             print("une fourmi rentre au bercail")
@@ -376,7 +377,7 @@ def affichage_graphique() :
 
     ax3.imshow(TABLO_PHERO_RETOUR)
 
-    ax3.set_title("phéromones retour")
+    ax3.set_title("phéromones RETOUR")
 
 
 
@@ -400,9 +401,9 @@ SIMULATION_EN_COURS = True # cette variable indique que la simulation est en cou
 FOURMIS = [[ CASE_FOURMILIERE, False , (randint(-1,1),randint(-1,1))]] # Liste des fourmis, on commence avec une fourmi
 
 
-# chque fourmi sera une liste : [coordonnées , Rau ou pas, vecteur déplacement ]
+# chaque fourmi sera une liste : [coordonnées , RAU ou pas, vecteur déplacement ]
 
-# corrdonnées = couple
+# coordonnées = couple
 # RAU ou pas = booléen
 # vecteur déplacement = couple
 
@@ -434,7 +435,7 @@ while SIMULATION_EN_COURS :
     #FB j'enlève le code suivant pour le moment
 
     '''
-    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : #La simulation s'arrête quand x sont récoltées (implémenter l'unicité de la RAU, une réserve limitée ?) (OU quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
+    if NB_RAU_COLLECTEES == NB_RAU_INITIAL : # La simulation s'arrête quand x sont récoltées (quand toutes les fourmis sont rentrés à la fourmilière avec une RAU ?)
         SIMULATION_EN_COURS = False
 
     '''
@@ -442,8 +443,6 @@ while SIMULATION_EN_COURS :
 
 plt.show()
 
-
-#Si on met un fort ALPHA_PHEROMONE personne va vouloir rentrer à la fourmilière elles vont juste tourner autour
 
 
 ##
